@@ -3,7 +3,7 @@
  * Hel.io Crypto Payment Gateway for WHMCS
  * 
  * This module integrates WHMCS with Hel.io's cryptocurrency payment platform
- * using their JavaScript widget for seamless crypto payments.
+ * using their Payment widget for seamless crypto payments.
  * 
  * @author WHMCS Community
  * @version 1.0.0
