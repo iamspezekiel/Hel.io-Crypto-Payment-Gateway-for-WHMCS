@@ -121,24 +121,27 @@ logWebhookActivity('Webhook received', [
 ]);
 
 // Check if this is a payment success event
-if (!isset($webhookData['event']) || $webhookData['event'] !== 'payment.success') {
+$validSuccessEvents = ['payment.success', 'payment.completed', 'transaction.success', 'transaction.completed'];
+$eventType = $webhookData['event'] ?? $webhookData['type'] ?? 'unknown';
+
+if (!in_array($eventType, $validSuccessEvents)) {
     http_response_code(200);
     logWebhookActivity('Ignoring non-payment event', [
-        'event_type' => $webhookData['event'] ?? 'unknown'
+        'event_type' => $eventType
     ]);
     die("Event ignored");
 }
 
-// Extract transaction data
-$transaction = $webhookData['transaction'] ?? [];
+// Extract transaction data (Hel.io webhook format)
+$transaction = $webhookData['transaction'] ?? $webhookData;
 $metadata = $transaction['metadata'] ?? [];
 
-// Get required fields
-$transactionId = $transaction['id'] ?? '';
-$amount = $transaction['amount'] ?? 0;
-$currency = $transaction['currency'] ?? '';
-$status = $transaction['status'] ?? '';
-$invoiceId = $metadata['invoice_id'] ?? '';
+// Get required fields - handle both possible formats
+$transactionId = $transaction['id'] ?? $transaction['transactionId'] ?? '';
+$amount = $transaction['amount'] ?? $transaction['paidAmount'] ?? 0;
+$currency = $transaction['currency'] ?? $transaction['paidCurrency'] ?? '';
+$status = $transaction['status'] ?? 'completed';
+$invoiceId = $metadata['invoice_id'] ?? $transaction['invoice_id'] ?? '';
 
 // Validate required fields
 if (empty($transactionId) || empty($invoiceId) || $amount <= 0) {
@@ -174,8 +177,9 @@ if ($existingTransaction) {
     die("Transaction already processed");
 }
 
-// Verify payment status
-if ($status !== 'completed' && $status !== 'confirmed') {
+// Verify payment status - be more flexible with status values
+$validStatuses = ['completed', 'confirmed', 'success', 'paid'];
+if (!in_array(strtolower($status), $validStatuses)) {
     http_response_code(400);
     logWebhookActivity('Payment not completed', [
         'transaction_id' => $transactionId,

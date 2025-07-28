@@ -8,7 +8,8 @@ This module allows WHMCS users to accept cryptocurrency payments via Hel.io's se
 
 ### Key Features
 
-- ✅ **Popup Widget Integration** - Uses Hel.io's JavaScript widget for seamless payment experience
+- ✅ **Inline Widget Integration** - Uses Hel.io's embedded checkout widget
+- ✅ **Flexible Display Modes** - Support for both inline and modal display
 - ✅ **Multi-Currency Support** - Accepts payments in various cryptocurrencies
 - ✅ **Webhook Verification** - Secure signature-based webhook validation
 - ✅ **Real-time Updates** - Automatic invoice status updates upon payment confirmation
@@ -68,8 +69,10 @@ Fill in the following configuration fields:
 
 | Field | Description | Required |
 |-------|-------------|----------|
-| **Public Key** | Your Hel.io public API key | ✅ Yes |
+| **Paylink ID** | Your Hel.io Paylink ID from your dashboard | ✅ Yes |
 | **Webhook Secret** | Secret key for webhook signature verification | ✅ Yes |
+| **Theme Mode** | Choose between Light or Dark theme | ❌ Optional |
+| **Display Mode** | Choose between Inline or Modal display | ❌ Optional |
 | **Test Mode** | Enable for development/testing | ❌ Optional |
 
 ### Step 3: Configure Webhook URL in Hel.io
@@ -87,12 +90,11 @@ Fill in the following configuration fields:
 ### Payment Flow
 
 1. **Invoice Generation**: Customer receives an invoice with Hel.io as payment option
-2. **Payment Initiation**: Customer clicks "Pay with Crypto via Hel.io"
-3. **Widget Display**: Hel.io's popup widget opens with payment details
-4. **Crypto Payment**: Customer completes payment using their preferred cryptocurrency
-5. **Webhook Notification**: Hel.io sends payment confirmation to your webhook URL
-6. **Invoice Update**: WHMCS automatically marks the invoice as paid
-7. **Customer Redirect**: Customer is redirected back to WHMCS with confirmation
+2. **Widget Display**: Hel.io's checkout widget loads directly on the payment page
+3. **Crypto Payment**: Customer completes payment using their preferred cryptocurrency
+4. **Webhook Notification**: Hel.io sends payment confirmation to your webhook URL
+5. **Invoice Update**: WHMCS automatically marks the invoice as paid
+6. **Customer Confirmation**: Customer sees payment confirmation and is redirected
 
 ### Security Features
 
@@ -130,10 +132,11 @@ The module includes comprehensive error handling:
 - Check webhook secret matches between WHMCS and Hel.io
 - Review WHMCS activity logs for error messages
 
-**2. JavaScript widget not loading**
-- Ensure `https://pay.hel.io/v1/pay.js` is accessible
+**2. Widget not displaying**
+- Ensure `https://embed.hel.io/assets/index-v1.js` is accessible
 - Check browser console for JavaScript errors
-- Verify public key is correctly configured
+- Verify Paylink ID is correctly configured
+- Check if CSP headers are blocking the widget
 
 **3. Webhook signature verification failing**
 - Confirm webhook secret is identical in both systems
@@ -161,13 +164,6 @@ The module includes comprehensive error handling:
 3. Test with small amounts first
 4. Verify webhook functionality with test transactions
 
-## Features
-
-- Lightweight and easy to set up
-- Uses Hel.io's official payment widget
-- Supports automatic callback/webhook verification
-- Secure, reusable, and dynamic (host URL auto-detected)
-
 ### Customization
 
 The module is designed to be easily customizable:
@@ -175,7 +171,7 @@ The module is designed to be easily customizable:
 - Extend `helio_config()` for additional settings
 - Update webhook handler for custom processing logic
 
-##  Support
+## 🤝 Support
 
 ### Getting Help
 
